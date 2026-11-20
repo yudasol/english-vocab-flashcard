@@ -205,6 +205,7 @@
     background:#fff6e6;border:1px solid #ffe0b0;color:#a9700a;white-space:nowrap;
   }
   .say-sentence:active{transform:scale(.96);}
+  .say-sentence.speaking{background:#ffe7bd;border-color:#ffcf87;}
   .face-bottom{flex-wrap:wrap;gap:7px;}
   .speak.mic{background:#eef6ff;border-color:#cfe4ff;color:#2c70b6;}
   .speak.mic.listening{background:#dcecff;animation:micPulse 1.1s ease-in-out infinite;}
@@ -619,7 +620,7 @@
     <div class="word-list" id="wordList"></div>
   </section>
 
-  <p class="footnote">단어와 학습 기록은 이 브라우저에만 저장돼요(localStorage). 기기를 바꾸거나 브라우저 기록을 지우면 처음 상태로 돌아갑니다.<br>📌 로 고른 시험 단어도 이 브라우저에 함께 저장돼요.<br>🎤 따라 말하기는 마이크를 쓰는 기능이라 https 주소(예: GitHub Pages)로 열 때 동작해요.<br>🎧 표시된 단어는 교재 MP3 원어민 발음으로, 나머지 단어는 기기 음성(TTS)으로 들려줘요.</p>
+  <p class="footnote">단어와 학습 기록은 이 브라우저에만 저장돼요(localStorage). 기기를 바꾸거나 브라우저 기록을 지우면 처음 상태로 돌아갑니다.<br>📌 로 고른 시험 단어도 이 브라우저에 함께 저장돼요.<br>🎤 따라 말하기는 마이크를 쓰는 기능이라 https 주소(예: GitHub Pages)로 열 때 동작해요.<br>🎧 표시된 단어는 교재 MP3 원어민 발음으로, 나머지 단어는 기기 음성(TTS)으로 들려줘요.<br>🔊 문장 듣기는 10~11살 어린이 원어민 목소리로 읽은 예문 음성이에요.</p>
 </div>
 
 <div class="toast" id="toast" role="status" aria-live="polite"></div>
@@ -752,7 +753,7 @@
     [2, 'head', '머리', 'hɛd', 'My head hurts now.'],
     [2, 'hair', '머리카락', 'hɛr', 'Her hair is long.'],
     [2, 'shoulder', '어깨', 'ˈʃoʊldər', 'Touch your shoulder, please.'],
-    [2, 'back', '등', 'bæk', 'Put it on my back.'],
+    [2, 'back', '등', 'bæk', 'Wash my back, please.'],
     [2, 'bottom', '엉덩이', 'ˈbɑtəm', 'Sit on your bottom.'],
     [2, 'arm', '팔', 'ɑrm', 'Hold my arm, please.'],
     [2, 'hand', '손', 'hænd', 'Give me your hand.'],
@@ -764,7 +765,7 @@
     [2, 'heart', '심장, 가슴', 'hɑrt', 'My heart is beating.'],
     [2, 'face', '얼굴', 'feɪs', 'Wash your face now.'],
     [2, 'eye', '눈', 'aɪ', 'Close one eye, please.'],
-    [2, 'eyebrow', '눈썹', 'ˈaɪˌbraʊ', 'She has a dark eyebrow.'],
+    [2, 'eyebrow', '눈썹', 'ˈaɪˌbraʊ', 'She has dark eyebrows.'],
     [2, 'ear', '귀', 'ɪr', 'My ear hurts a little.'],
     [2, 'nose', '코', 'noʊz', 'My nose is cold.'],
     [2, 'cheek', '볼, 뺨', 'ʧik', 'She kissed my cheek.'],
@@ -802,7 +803,7 @@
     [4, 'together', '함께, 같이', 'təˈgɛðər', 'We play together every day.'],
     [4, 'kid', '아이', 'kɪd', 'That kid is my friend.'],
     [4, 'name', '이름, 성명', 'neɪm', 'What is your name?'],
-    [4, 'age', '나이', 'eɪʤ', 'What is his age?'],
+    [4, 'age', '나이', 'eɪʤ', 'He is my age.'],
     [4, 'old', '나이가 ~인, 나이가 많은', 'oʊld', 'My dog is very old.'],
     [4, 'person', '사람', 'ˈpɜrsən', 'He is a good person.'],
     [4, 'people', '사람들', 'ˈpipəl', 'Many people like music.'],
@@ -815,10 +816,10 @@
     [4, 'Ms.', '~ 씨 (여성의 성·이름 앞에)', 'mɪz', 'Ms. Lee is very kind.'],
     [4, 'Miss', '~ 씨 (미혼 여성)', 'mɪs', 'Miss Park is my teacher.'],
     [4, 'Mrs.', '~ 부인 (기혼 여성)', 'ˈmɪsɪz', 'Mrs. Kim has two kids.'],
-    [4, 'elementary school', '초등학교', 'ˌɛləˈmɛnʧri skul', 'My school is an elementary school.'],
+    [4, 'elementary school', '초등학교', 'ˌɛləˈmɛnʧri skul', 'I go to an elementary school.'],
     [4, 'teach', '가르치다', 'tiʧ', 'I teach my little sister.'],
     [4, 'student', '학생', 'ˈstudənt', 'I am a good student.'],
-    [4, 'company', '회사', 'ˈkʌmpəni', 'He works in a company.'],
+    [4, 'company', '회사', 'ˈkʌmpəni', 'My dad works at a company.'],
     [4, 'work', '일하다', 'wɜrk', 'I work at home.'],
     [4, 'lucky', '운이 좋은', 'ˈləki', 'You are very lucky.'],
     [5, 'friend', '친구', 'frɛnd', 'My friend is very kind.'],
@@ -841,7 +842,7 @@
     [5, 'long', '긴', 'lɔŋ', 'Her hair is very long.'],
     [5, 'short', '짧은, 키가 작은', 'ʃɔrt', 'My hair is short.'],
     [5, 'bald', '대머리의', 'bɔld', 'My uncle is bald.'],
-    [5, 'pony tail', '포니테일', 'ˈpoʊˌni teɪl', 'She has a pony tail.'],
+    [5, 'pony tail', '포니테일', 'ˈpoʊˌni teɪl', 'Her hair is in a pony tail.'],
     [5, 'neat', '단정한, 정돈된', 'nit', 'Your room is neat.'],
     [5, 'tidy', '깔끔한, 정돈된', 'ˈtaɪdi', 'My desk is tidy.'],
     [5, 'wavy', '구불구불한', 'ˈweɪvi', 'Her hair is wavy.'],
@@ -888,11 +889,11 @@
     [7, 'forget', '잊다', 'fərˈgɛt', 'Do not forget your bag.'],
     [7, 'mistake', '실수', 'mɪˈsteɪk', 'I made one mistake.'],
     [7, 'promise', '약속하다', 'ˈprɑməs', 'I promise to help you.'],
-    [7, 'appointment', '약속', 'əˈpɔɪntmənt', 'I have an appointment today.'],
+    [7, 'appointment', '약속', 'əˈpɔɪntmənt', 'Mom has an appointment today.'],
     [7, 'keep', '유지하다, (약속을) 지키다', 'kip', 'Keep your promise, please.'],
     [7, 'secret', '비밀', 'ˈsikrɪt', 'It is a secret.'],
-    [7, 'gather', '모이다', 'ˈgæðər', 'We gather in the room.'],
-    [7, 'meeting', '만남, 회의', 'ˈmitɪŋ', 'I have a meeting now.'],
+    [7, 'gather', '모이다', 'ˈgæðər', 'We gather in my room.'],
+    [7, 'meeting', '만남, 회의', 'ˈmitɪŋ', 'My dad is in a meeting.'],
     [7, 'agree', '동의하다', 'əˈgri', 'I agree with you.'],
     [7, 'letter', '편지', 'ˈlɛtər', 'I got a letter today.'],
     [7, 'send', '보내다', 'sɛnd', 'Send me a picture.'],
@@ -979,7 +980,7 @@
     [11, 'puppet', '인형, 꼭두각시', 'ˈpʌpɪt', 'The puppet can dance.'],
     [11, 'teddy bear', '테디 베어, 곰 인형', 'ˈtɛdi bɛr', 'My teddy bear is soft.'],
     [11, 'skates', '스케이트', 'skeɪts', 'My skates are too small.'],
-    [11, 'inline skates', '인라인 스케이트', 'ˈɪnlaɪn skeɪts', 'I ride my inline skates.'],
+    [11, 'inline skates', '인라인 스케이트', 'ˈɪnlaɪn skeɪts', 'Put on your inline skates.'],
     [11, 'exciting', '신나는, 흥미진진한', 'ɪkˈsaɪtɪŋ', 'This game is exciting.'],
     [11, 'play', '놀다', 'pleɪ', 'Let us play outside.'],
     [11, 'like', '좋아하다', 'laɪk', 'I like this song.'],
@@ -988,13 +989,13 @@
     [11, 'jump', '뛰다, 점프하다', 'ʤʌmp', 'The dog can jump.'],
     [11, 'jump rope', '줄넘기, 줄넘기 하다', 'ʤəmp roʊp', 'I jump rope every day.'],
     [11, 'puzzle', '퍼즐', 'ˈpʌzəl', 'This puzzle is hard.'],
-    [11, 'piece', '조각', 'pis', 'Give me one piece.'],
+    [11, 'piece', '조각', 'pis', 'Give me one piece of cake.'],
     [11, 'cube puzzle', '큐브 퍼즐', 'kjub ˈpəzəl', 'My cube puzzle is new.'],
     [11, 'hold', '잡고 있다, 쥐다', 'hoʊld', 'Please hold this for me.'],
     [11, 'soft', '부드러운', 'sɔft', 'My toy is very soft.'],
     [11, 'hard', '딱딱한, 어려운', 'hɑrd', 'The bread is hard.'],
     [11, 'of', '~의', 'əv', 'This is a cup of tea.'],
-    [11, 'role', '역할', 'roʊl', 'She has a small role.'],
+    [11, 'role', '역할', 'roʊl', 'She has a small role in the play.'],
     [11, 'need', '필요하다', 'nid', 'I need your help.'],
     [12, 'living room', '거실', 'ˈlɪvɪŋ rum', 'The living room is clean.'],
     [12, 'ceiling', '천장', 'ˈsilɪŋ', 'The ceiling is very high.'],
@@ -1018,7 +1019,7 @@
     [12, 'table', '탁자', 'ˈteɪbəl', 'The cup is on the table.'],
     [12, 'flower', '꽃', 'flaʊər', 'This flower is pretty.'],
     [12, 'camera', '카메라', 'ˈkæmərə', 'My camera is small.'],
-    [12, 'umbrella', '우산', 'ʌmˈbrɛlə', 'Take your umbrella today.'],
+    [12, 'umbrella', '우산', 'ʌmˈbrɛlə', 'Take your umbrella with you.'],
     [12, 'large', '넓은', 'lɑrʤ', 'This room is large.'],
     [12, 'narrow', '좁은', 'ˈnɛroʊ', 'This street is narrow.'],
     [13, 'kitchen', '부엌, 주방', 'ˈkɪʧən', 'My mom is in the kitchen.'],
@@ -1072,10 +1073,10 @@
     [15, 'free time', '자유 시간', 'fri taɪm', 'I read in my free time.'],
     [15, 'picnic', '소풍', 'ˈpɪkˌnɪk', 'We have a picnic today.'],
     [15, 'relax', '휴식을 취하다', 'rɪˈlæks', 'I relax on the sofa.'],
-    [15, 'rest', '휴식', 'rɛst', 'Take a little rest now.'],
+    [15, 'rest', '휴식', 'rɛst', 'Let\'s take a rest now.'],
     [15, 'gym', '체육관', 'ʤɪm', 'My dad is at the gym.'],
     [15, 'schedule', '일정, 스케줄', 'ˈskɛʤʊl', 'My schedule is very full.'],
-    [15, 'plan', '계획, 계획하다', 'plæn', 'We plan a small trip.'],
+    [15, 'plan', '계획, 계획하다', 'plæn', 'We have a plan for our trip.'],
     [15, 'downtown', '시내에', 'ˌdaʊnˈtaʊn', 'We go downtown by bus.'],
     [15, 'travel', '여행, 여행하다', 'ˈtrævəl', 'I love to travel.'],
     [15, 'trip', '여행, 여행하다', 'trɪp', 'Have a good trip!'],
@@ -1238,7 +1239,7 @@
     [33, 'introduce', '소개하다', 'ˌɪntrəˈdus', 'Let me introduce my friend.'],
     [33, 'before', '전에, 앞에', 'bɪˈfɔr', 'Wash your hands before dinner.'],
     [33, 'after', '뒤에, 후에', 'ˈæftər', 'We play after school.'],
-    [33, 'matter', '문제, 일', 'ˈmætər', 'It is a small matter.'],
+    [33, 'matter', '문제, 일', 'ˈmætər', 'What is the matter?'],
     [33, 'sure', '확신하는', 'ʃʊr', 'Sure, I can help you.'],
     [33, 'let', '~하게 놔두다', 'lɛt', 'Let me help you.'],
     [33, 'will', '~할 것이다', 'wɪl', 'I will call you later.'],
@@ -1261,7 +1262,7 @@
     [36, 'off', '(공간상으로) 떨어져', 'ɔf', 'Take your hat off.'],
     [36, 'from', '~부터', 'frʌm', 'I am from Korea.'],
     [36, 'to', '~로, ~쪽으로', 'tu', 'Give it to me.'],
-    [36, 'top', '맨 위, 꼭대기', 'tɔp', 'Put it on the top.'],
+    [36, 'top', '맨 위, 꼭대기', 'tɔp', 'Put it on the top shelf.'],
     [36, 'bottom', '맨 아래', 'ˈbɑtəm', 'The box is at the bottom.'],
     [36, 'there', '거기에', 'ðɛr', 'Put the box there.'],
     [36, 'for', '~을 위해', 'fɔr', 'This gift is for you.'],
@@ -1278,7 +1279,7 @@
     [37, 'some', '조금, 일부의', 'sʌm', 'Give me some milk.'],
     [37, 'something', '어떤 것, 무엇', 'ˈsʌmθɪŋ', 'I have something for you.'],
     [37, 'any', '어느, 어떤', 'ˈɛni', 'I do not have any money.'],
-    [37, 'anything', '아무것, 무엇이든', 'ˈɛniˌθɪŋ', 'I can not see anything.'],
+    [37, 'anything', '아무것, 무엇이든', 'ˈɛniˌθɪŋ', 'I cannot see anything.'],
     [37, 'nothing', '아무것도 ~ 아니다', 'ˈnʌθɪŋ', 'There is nothing in the box.'],
     [37, 'few', '(수가) 적은', 'fju', 'I have a few books.'],
     [37, 'many', '(수가) 많은', 'ˈmɛni', 'I have many friends.'],
@@ -1844,7 +1845,35 @@
     return null;
   }
 
-  function speak(text, rate) {
+  /* 브라우저 TTS에는 어린이 음성이 따로 없다. 예문 파일이 없는 단어(직접 추가한 단어)만
+     이 길로 가고, 가장 밝고 또렷한 영어 음성에 높은 pitch·조금 느린 rate를 줘 10~11살 톤에 맞춘다. */
+  var CHILD_VOICE_HINTS = ['nicky', 'zoe', 'junior', 'ava', 'samantha', 'allison', 'susan', 'kathy', 'google us english', 'aria', 'jenny'];
+
+  function pickEnVoice(child) {
+    if (!('speechSynthesis' in window) || typeof window.speechSynthesis.getVoices !== 'function') return null;
+    var all = window.speechSynthesis.getVoices() || [];
+    var en = [];
+    for (var i = 0; i < all.length; i++) {
+      var lang = String(all[i].lang || '').toLowerCase();
+      if (lang.indexOf('en') === 0) en.push(all[i]);
+    }
+    if (!en.length) return null;
+    var us = [];
+    for (var j = 0; j < en.length; j++) {
+      if (String(en[j].lang || '').toLowerCase().indexOf('en-us') === 0) us.push(en[j]);
+    }
+    var pool = us.length ? us : en;
+    if (child) {
+      for (var h = 0; h < CHILD_VOICE_HINTS.length; h++) {
+        for (var k = 0; k < pool.length; k++) {
+          if (String(pool[k].name || '').toLowerCase().indexOf(CHILD_VOICE_HINTS[h]) >= 0) return pool[k];
+        }
+      }
+    }
+    return pool[0];
+  }
+
+  function speak(text, rate, pitch) {
     if (!text) return;
     if (!('speechSynthesis' in window) || typeof window.SpeechSynthesisUtterance !== 'function') {
       toast('이 브라우저는 발음 듣기를 지원하지 않아요');
@@ -1855,15 +1884,9 @@
       var u = new window.SpeechSynthesisUtterance(String(text));
       u.lang = 'en-US';
       u.rate = rate || 0.85;
-      u.pitch = 1;
-      var voices = window.speechSynthesis.getVoices() || [];
-      for (var i = 0; i < voices.length; i++) {
-        var lang = voices[i].lang || '';
-        if (lang.indexOf('en-US') === 0 || lang.indexOf('en_US') === 0) {
-          u.voice = voices[i];
-          break;
-        }
-      }
+      u.pitch = pitch || 1;
+      var v = pickEnVoice(u.pitch > 1);
+      if (v) u.voice = v;
       window.speechSynthesis.speak(u);
     } catch (e) {
       toast('발음을 재생하지 못했어요');
@@ -2136,6 +2159,156 @@
     playClip(info, btn);
   }
 
+  /* ───── 예문 음성 (10~11살 어린이 원어민 목소리) ─────
+     예문 569개를 en-US-AnaNeural로 읽혀 단어마다 MP3 한 개씩 audio/ex/ 아래에 두었다.
+     · 파일 이름: d{Day}-{단어슬러그}.mp3  (예: audio/ex/d1-happy.mp3, audio/ex/d15-picnic.mp3)
+     · 목소리: AnaNeural(어린이 음성) pitch −22Hz · rate −6% → 발화 기본 음높이 약 250~276Hz(10~11살 여아대)
+     · 교재 569단어만 파일이 있고, 직접 추가한 단어는 브라우저 TTS(높은 pitch)로 읽는다.
+     · iOS에서 구간 이동 없이 파일 처음부터 재생하므로 페이드인·잘림 문제가 없다. */
+  var EX_V = '1';
+  var EX_AUDIO = (function () {
+    var map = {};
+    for (var i = 0; i < WORDS.length; i++) {
+      var k = exKey(WORDS[i][1], WORDS[i][0]);
+      if (k) map[k] = 1;
+    }
+    return map;
+  })();
+  var exEl = null;            // 폴백 <audio> 요소 하나
+  var exBuffers = {};         // src -> 디코딩해 둔 AudioBuffer
+  var exLoading = {};         // src -> 디코딩 중인 Promise
+  var exFailed = {};          // src -> 재생 실패(파일 없음 등)
+  var exVoice = null;         // 지금 재생 중인 Web Audio 소스
+  var exBtn = null;           // 재생 중 표시를 붙인 버튼
+  var exTimer = 0;
+
+  function exSlug(text) {
+    return String(text == null ? '' : text).toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '');
+  }
+
+  function exKey(word, day) {
+    var d = Number(day);
+    var s = exSlug(word);
+    return (d > 0 && s) ? ('d' + d + '-' + s) : '';
+  }
+
+  function exFor(w) {
+    if (!w || !w.word) return null;
+    var key = exKey(w.word, dayOf(w));
+    if (!key || !Object.prototype.hasOwnProperty.call(EX_AUDIO, key)) return null;
+    return { key: key, src: 'audio/ex/' + key + '.mp3?v=' + EX_V };
+  }
+
+  function exampleElement(src) {
+    if (!exEl) {
+      exEl = document.createElement('audio');
+      exEl.id = 'exampleAudio';
+      exEl.preload = 'auto';
+      exEl.setAttribute('playsinline', '');
+      exEl.setAttribute('webkit-playsinline', '');
+      exEl.setAttribute('aria-hidden', 'true');
+      exEl.style.cssText = 'position:absolute;left:-9999px;width:1px;height:1px;opacity:0;pointer-events:none';
+      document.body.appendChild(exEl);
+      exEl.addEventListener('ended', function () { markSay(false); });
+    }
+    if (exEl.getAttribute('data-src') !== src) {
+      exEl.setAttribute('data-src', src);
+      exEl.src = src;
+      try { exEl.load(); } catch (e) {}
+    }
+    return exEl;
+  }
+
+  function loadExample(src) {
+    var ctx = audioContextLive();
+    if (!ctx || exFailed[src]) return null;
+    if (exBuffers[src]) return Promise.resolve(exBuffers[src]);
+    if (exLoading[src]) return exLoading[src];
+    if (typeof fetch !== 'function') return null;
+    var p = fetch(src, { credentials: 'same-origin' }).then(function (res) {
+      if (!res.ok) throw new Error('HTTP ' + res.status);
+      return res.arrayBuffer();
+    }).then(function (data) {
+      return new Promise(function (resolve, reject) {
+        try {
+          var ret = ctx.decodeAudioData(data, resolve, reject);
+          if (ret && typeof ret.then === 'function') ret.then(resolve, reject);
+        } catch (e) { reject(e); }
+      });
+    }).then(function (buf) {
+      exBuffers[src] = buf;
+      exLoading[src] = null;
+      return buf;
+    }, function () {
+      exLoading[src] = null;
+      exFailed[src] = true;
+      return null;
+    });
+    exLoading[src] = p;
+    return p;
+  }
+
+  function stopExample() {
+    if (exTimer) { clearTimeout(exTimer); exTimer = 0; }
+    if (exVoice) {
+      try { exVoice.onended = null; } catch (e) {}
+      try { exVoice.stop(0); } catch (e) {}
+      try { exVoice.disconnect(); } catch (e) {}
+      exVoice = null;
+    }
+    if (exEl) { try { exEl.pause(); } catch (e) {} }
+    markSay(false);
+  }
+
+  function markSay(on, btn) {
+    if (btn) exBtn = btn;
+    if (exBtn) exBtn.classList[on ? 'add' : 'remove']('speaking');
+    if (!on) exBtn = null;
+  }
+
+  function playExampleBuffer(src) {
+    var ctx = audioContextLive();
+    var buf = exBuffers[src];
+    if (!ctx || !buf) return false;
+    if (ctx.state === 'suspended' && ctx.resume) { try { ctx.resume(); } catch (e) {} }
+    var node;
+    try { node = ctx.createBufferSource(); node.buffer = buf; node.connect(ctx.destination); } catch (e) { return false; }
+    exVoice = node;
+    node.onended = function () { if (exVoice === node) { exVoice = null; markSay(false); } };
+    try { node.start(0); } catch (e) { exVoice = null; return false; }
+    exTimer = setTimeout(function () { if (exVoice === node) { exVoice = null; markSay(false); } }, Math.round(buf.duration * 1000) + 1200);
+    return true;
+  }
+
+  function prefetchExample() {
+    var cw = currentWord();
+    var info = cw ? exFor(cw) : null;
+    if (info) loadExample(info.src);
+  }
+
+  /* 예문 듣기: 저장소에 만든 어린이 음성 파일 → 실패하면 브라우저 TTS(높은 pitch) */
+  function playExample(w, btn) {
+    var text = w && w.example ? String(w.example) : '';
+    var info = exFor(w);
+    if (!info) { speak(text, 0.92, 1.22); return; }
+    stopClip();
+    stopExample();
+    if (exFailed[info.src]) { speak(text, 0.92, 1.22); return; }
+    markSay(true, btn);
+    if (playExampleBuffer(info.src)) { loadExample(info.src); return; }
+    var el = exampleElement(info.src);
+    try { el.currentTime = 0; } catch (e) {}
+    var p = el.play();
+    if (p && typeof p.catch === 'function') {
+      p.catch(function () {
+        exFailed[info.src] = true;
+        markSay(false);
+        speak(text, 0.92, 1.22);
+      });
+    }
+    loadExample(info.src);
+  }
+
   /* ───────── 발음 기호 ───────── */
   function ipaRaw(w) {
     return String((w && w.ipa) || '').replace(/^[\s\/\[]+/, '').replace(/[\s\/\]]+$/, '').trim();
@@ -2382,6 +2555,7 @@
     state.flipped = false;
     setRatingEnabled(false);
     stopMic();
+    stopExample();          // 카드가 바뀌면 예문 음성은 바로 멈춘다
     hideMicFeedback();
 
     // 삭제 등으로 큐가 줄었을 때 보정
@@ -2999,7 +3173,7 @@
       if (e.target.closest('[data-say]')) {
         e.stopPropagation();
         var cw = currentWord();
-        if (cw && cw.example) speak(cw.example, 0.85);
+        if (cw && cw.example) playExample(cw, e.target.closest('[data-say]'));
         else toast('이 단어에는 아직 예문이 없어요');
         return;
       }
@@ -3010,6 +3184,7 @@
       }
       card.classList.toggle('flipped');
       state.flipped = card.classList.contains('flipped');
+      if (state.flipped) prefetchExample();
     });
     card.addEventListener('keydown', function (e) {
       if (e.target && e.target.closest && e.target.closest('button')) return; // 버튼 키보드 조작은 그대로
@@ -3017,6 +3192,7 @@
         e.preventDefault();
         card.classList.toggle('flipped');
         state.flipped = card.classList.contains('flipped');
+        if (state.flipped) prefetchExample();
       }
     });
 
@@ -3123,6 +3299,38 @@
   }
 
   /* ───────── boot ───────── */
+  /* 예문 다듬기(초등 눈높이) 이전에 앱을 켜 둔 기록(localStorage)도 새 문장으로 맞춘다.
+     바뀐 18문장만 정확히 일치할 때 치환하므로, 직접 쓴 예문은 건드리지 않는다. */
+  var EX_FIX = {
+    'Put it on my back.': 'Wash my back, please.',
+    'She has a dark eyebrow.': 'She has dark eyebrows.',
+    'What is his age?': 'He is my age.',
+    'My school is an elementary school.': 'I go to an elementary school.',
+    'He works in a company.': 'My dad works at a company.',
+    'She has a pony tail.': 'Her hair is in a pony tail.',
+    'I have an appointment today.': 'Mom has an appointment today.',
+    'We gather in the room.': 'We gather in my room.',
+    'I have a meeting now.': 'My dad is in a meeting.',
+    'I ride my inline skates.': 'Put on your inline skates.',
+    'Give me one piece.': 'Give me one piece of cake.',
+    'She has a small role.': 'She has a small role in the play.',
+    'Take your umbrella today.': 'Take your umbrella with you.',
+    'Take a little rest now.': "Let's take a rest now.",
+    'We plan a small trip.': 'We have a plan for our trip.',
+    'It is a small matter.': 'What is the matter?',
+    'Put it on the top.': 'Put it on the top shelf.',
+    'I can not see anything.': 'I cannot see anything.'
+  };
+
+  function migrateExamples() {
+    var n = 0;
+    state.words.forEach(function (w) {
+      var fixed = EX_FIX[String(w.example || '').trim()];
+      if (fixed) { w.example = fixed; n++; }
+    });
+    return n;
+  }
+
   // 예전(교재 Day 이전) 저장본에 교재 단어를 더해 줌 — 사용자가 직접 넣은 단어는 그대로 유지
   function mergeTextbook() {
     var seen = {};
@@ -3184,6 +3392,7 @@
       state.words = defaultWords();
     }
     if (legacy) mergeTextbook();
+    migrateExamples();
     save();
     var today = ymd(new Date());
     $('addDate').value = today;
