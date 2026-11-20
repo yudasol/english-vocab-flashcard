@@ -125,8 +125,9 @@
   .flip-inner{position:relative;width:100%;height:100%;transform-style:preserve-3d;-webkit-transform-style:preserve-3d;transition:transform .55s cubic-bezier(.35,.15,.2,1);}
   .flip-card.flipped .flip-inner{transform:rotateY(180deg);}
   .face{
+    --fp:18px;--fpx:20px;
     position:absolute;inset:0;display:flex;flex-direction:column;
-    border-radius:24px;padding:18px 20px;
+    border-radius:24px;padding:var(--fp) var(--fpx);
     backface-visibility:hidden;-webkit-backface-visibility:hidden;
     overflow:hidden;
     border:1px solid #e3e6f3;
@@ -136,6 +137,22 @@
   .face.back{
     transform:rotateY(180deg);
     background:linear-gradient(158deg,#ffffff 0%,#f8fbff 55%,#eef6ff 100%);
+  }
+  /* 단어 사진(Day 15) — 카드 위쪽을 꽉 채우는 사진 띠 */
+  .photo-hero{
+    flex:0 0 auto;position:relative;overflow:hidden;background:#eef1f8;
+    margin:calc(-1 * var(--fp)) calc(-1 * var(--fpx)) 9px;
+    height:126px;
+  }
+  .photo-hero img{
+    display:block;width:100%;height:100%;object-fit:cover;object-position:center 48%;
+    animation:heroIn .4s ease both;
+  }
+  @keyframes heroIn{from{opacity:.15;}to{opacity:1;}}
+  .face.back .photo-hero{height:94px;}
+  .photo-hero::after{
+    content:"";position:absolute;inset:auto 0 0 0;height:26px;pointer-events:none;
+    background:linear-gradient(to bottom,rgba(24,24,60,0),rgba(24,24,60,.10));
   }
   .face-top{display:flex;align-items:center;justify-content:space-between;gap:8px;min-height:24px;}
   .tag{
@@ -291,6 +308,10 @@
     background:#fbfcff;border:1px solid #eef1f8;
   }
   .word-main{flex:1;min-width:0;}
+  .word-thumb{
+    flex:0 0 46px;width:46px;height:36px;border-radius:10px;object-fit:cover;
+    background:#eef1f8;border:1px solid #e7ebf6;
+  }
   .word-en{font-size:14.5px;font-weight:800;letter-spacing:-.02em;display:flex;align-items:center;gap:5px;}
   .word-en .mini-speak{font-size:11px;padding:2px 5px;border-radius:8px;background:#fff6e6;border:1px solid #ffe0b0;line-height:1.2;}
   .word-en .badge.day{font-size:9.5px;padding:2px 6px;line-height:1.5;}
@@ -364,6 +385,8 @@
   .toast.show{opacity:1;transform:translate(-50%,0);}
 
   @media (min-width:640px){
+    .photo-hero{height:132px;}
+    .face.back .photo-hero{height:96px;}
     .app{padding:24px 22px 48px;}
     .panel{padding:20px;}
     .brand h1{font-size:21px;}
@@ -388,7 +411,7 @@
     .pick-info{font-size:12px;}
     .pick-btn-sm{padding:6px 9px;font-size:11px;}
     .del-btn{width:28px;height:28px;font-size:12px;}
-    .face{padding:16px;}
+    .face{--fp:16px;--fpx:16px;}
     .speak{padding:8px 11px;font-size:11.5px;}
     .say-sentence{padding:5px 7px;font-size:10.5px;}
     .card-ipa{font-size:11.5px;padding:2px 9px;}
@@ -1307,6 +1330,44 @@
       }
     }
   };
+
+  /* ───────── 단어 사진 (Day 15) ─────────
+     Day 15 스물다섯 단어에만 붙는 실사 사진. images/day15/ 아래에 560×266(약 2:1) JPEG(장당 20~45KB)로 넣어 두었다.
+     외부 링크(핫링크) 없이 저장소 안 파일만 쓰고, 다른 Day 단어나 직접 추가한 단어는 사진 없이 기존과 똑같이 보인다.
+     단어 철자(소문자)로 찾으므로, 저장된 단어장(localStorage)이든 새로 추가한 단어든 Day 15 철자가 같으면 사진이 붙는다. */
+  var DAY15_PHOTOS = {
+    'free time': 'images/day15/free-time.jpg',
+    'picnic': 'images/day15/picnic.jpg',
+    'relax': 'images/day15/relax.jpg',
+    'rest': 'images/day15/rest.jpg',
+    'gym': 'images/day15/gym.jpg',
+    'schedule': 'images/day15/schedule.jpg',
+    'plan': 'images/day15/plan.jpg',
+    'downtown': 'images/day15/downtown.jpg',
+    'travel': 'images/day15/travel.jpg',
+    'trip': 'images/day15/trip.jpg',
+    'vacation': 'images/day15/vacation.jpg',
+    'hide': 'images/day15/hide.jpg',
+    'library': 'images/day15/library.jpg',
+    'choose': 'images/day15/choose.jpg',
+    'pick': 'images/day15/pick.jpg',
+    'lend': 'images/day15/lend.jpg',
+    'diary': 'images/day15/diary.jpg',
+    'write': 'images/day15/write.jpg',
+    'study': 'images/day15/study.jpg',
+    'hit': 'images/day15/hit.jpg',
+    'cry': 'images/day15/cry.jpg',
+    'fix': 'images/day15/fix.jpg',
+    'go': 'images/day15/go.jpg',
+    'continue': 'images/day15/continue.jpg',
+    'stay': 'images/day15/stay.jpg'
+  };
+
+  function photoFor(w) {
+    if (!w || typeof w.word !== 'string') return '';
+    if (typeof dayOf === 'function' && dayOf(w) !== 15) return '';
+    return DAY15_PHOTOS[w.word.trim().toLowerCase()] || '';
+  }
 
   function defaultWords() {
     var today = ymd(new Date());
@@ -2268,24 +2329,28 @@
       : '';
     var speakBtn = '<button class="speak" type="button" data-speak="' + esc(w.word) + '" aria-label="' + esc(w.word) + ' 발음 듣기">🔊 단어</button>';
     var micBtn = '<button class="speak mic" type="button" data-mic="1" aria-label="' + esc(w.word) + ' 따라 말하기">🎤 따라 말하기</button>';
+    var photo = photoFor(w);
+    var hero = photo
+      ? '<div class="photo-hero"><img src="' + esc(photo) + '" alt="" decoding="async"></div>'
+      : '';
 
     if (state.dir === 'en2kr') {
       if (side === 'front') {
-        return '<div class="face-top">' + tag + '<span class="face-hint">눌러서 뜻 보기</span></div>' +
+        return hero + '<div class="face-top">' + tag + '<span class="face-hint">눌러서 뜻 보기</span></div>' +
           '<div class="card-center">' + wordBlock + '</div>' +
           '<div class="face-bottom">' + speakBtn + micBtn + '</div>';
       }
-      return '<div class="face-top">' + tag + '<span class="face-hint">' + hintTop + '</span></div>' +
+      return hero + '<div class="face-top">' + tag + '<span class="face-hint">' + hintTop + '</span></div>' +
         '<div class="card-center"><div class="card-meaning">' + esc(w.meaning) + '</div>' + ex + '</div>' +
         '<div class="face-bottom">' + speakBtn + micBtn + '</div>';
     }
 
     if (side === 'front') {
-      return '<div class="face-top">' + tag + '<span class="face-hint">눌러서 영어 단어 보기</span></div>' +
+      return hero + '<div class="face-top">' + tag + '<span class="face-hint">눌러서 영어 단어 보기</span></div>' +
         '<div class="card-center"><div class="card-meaning">' + esc(w.meaning) + '</div></div>' +
         '<div class="face-bottom"><span class="face-hint">이 뜻의 영어 단어는?</span></div>';
     }
-    return '<div class="face-top">' + tag + '<span class="face-hint">' + esc(w.meaning) + '</span></div>' +
+    return hero + '<div class="face-top">' + tag + '<span class="face-hint">' + esc(w.meaning) + '</span></div>' +
       '<div class="card-center">' + wordBlock + ex + '</div>' +
       '<div class="face-bottom">' + speakBtn + micBtn + '</div>';
   }
@@ -2532,10 +2597,12 @@
       var ipa = ipaDisp(w);
       var day = dayOf(w);
       var picked = isPicked(w);
+      var thumb = photoFor(w);
       return '<div class="word-row' + (picked ? ' picked' : '') + '">' +
         '<button class="pick-btn" type="button" data-pick="' + esc(w.id) + '" aria-pressed="' + (picked ? 'true' : 'false') + '"' +
           ' aria-label="' + esc(w.word) + (picked ? ' 시험 선택 해제' : ' 시험 단어로 선택') + '" title="' +
           (picked ? '시험 단어에서 빼기' : '시험 단어로 고르기') + '">' + (picked ? '✓' : '📌') + '</button>' +
+        (thumb ? '<img class="word-thumb" src="' + esc(thumb) + '" alt="" loading="lazy" decoding="async">' : '') +
         '<div class="word-main">' +
           '<div class="word-en">' + esc(w.word) +
             (day ? '<span class="badge day">Day ' + day + '</span>' : '') +
