@@ -1206,36 +1206,40 @@
      교재 녹음에서 단어별 발화 구간을 재어 둔 표.
      형식: { Day: { src: 'audio/day15.mp3', words: { '단어': [발화시작초, 발화끝초] } } }
      초 값은 오디오 파형의 무음 구간을 분석해 잰 실제 발화 지점이고, 재생할 때 앞뒤로 조금씩 여유를 붙인다.
-     Day 15: 교재 녹음(3분 10초)에서 단어 25개 발음만 순서대로 잘라 33초짜리 audio/day15.mp3 로 만들었다. */
+     Day 15: 교재 녹음(3분 10초)에서 단어 25개를 **발음 2회씩 통째로** 잘라 audio/day15.mp3(92.6초)로 만들었다.
+       단어마다 ① 앞 무음 0.45초 ② 1회차 발음 ③ 원음 그대로의 사이 무음(약 0.94초) ④ 2회차 발음 ⑤ 뒤 무음 0.60초
+       순서이고, 클립과 클립 사이 무음은 1.05초라 이웃 단어 소리가 섞이지 않는다.
+       발화는 원본 파형이 완전한 디지털 무음(0)에서 끊기는 지점을 그대로 잘라 썼기 때문에 앞 음절이 잘릴 여지가 없다.
+       아래 초는 완성된 day15.mp3를 다시 풀어서 잰 값이다([1회차 시작, 2회차 끝]). */
   var AUDIO_CLIPS = {
     15: {
-      src: 'audio/day15.mp3',
+      src: 'audio/day15.mp3?v=2',
       words: {
-        'free time': [0.257, 1.232],
-        'picnic': [1.853, 2.689],
-        'relax': [3.298, 4.183],
-        'rest': [4.787, 5.393],
-        'gym': [6.001, 6.573],
-        'schedule': [7.174, 8.024],
-        'plan': [8.623, 9.296],
-        'downtown': [9.902, 10.830],
-        'travel': [11.451, 12.108],
-        'trip': [12.724, 13.155],
-        'vacation': [13.756, 14.717],
-        'hide': [15.323, 15.899],
-        'library': [16.495, 17.381],
-        'choose': [17.989, 18.695],
-        'pick': [19.301, 19.763],
-        'lend': [20.371, 21.005],
-        'diary': [21.618, 22.449],
-        'write': [23.050, 23.646],
-        'study': [24.242, 25.001],
-        'hit': [25.612, 26.026],
-        'cry': [26.620, 27.310],
-        'fix': [27.834, 28.498],
-        'go': [29.101, 29.767],
-        'continue': [30.373, 31.237],
-        'stay': [31.838, 32.608]
+        'free time': [0.459, 3.565],
+        'picnic': [4.625, 7.287],
+        'relax': [8.348, 11.414],
+        'rest': [12.462, 14.915],
+        'gym': [15.962, 18.350],
+        'schedule': [19.410, 22.321],
+        'plan': [23.377, 25.821],
+        'downtown': [26.881, 29.909],
+        'travel': [30.970, 33.488],
+        'trip': [34.548, 36.453],
+        'vacation': [37.500, 40.672],
+        'hide': [41.719, 44.041],
+        'library': [45.102, 48.965],
+        'choose': [50.013, 52.610],
+        'pick': [53.670, 55.940],
+        'lend': [57.001, 59.454],
+        'diary': [60.514, 63.267],
+        'write': [64.315, 66.676],
+        'study': [67.737, 70.451],
+        'hit': [71.512, 73.573],
+        'cry': [74.616, 77.138],
+        'fix': [78.203, 80.639],
+        'go': [81.699, 84.087],
+        'continue': [85.121, 88.084],
+        'stay': [89.144, 92.028]
       }
     }
   };
@@ -1565,13 +1569,19 @@
   }
 
   /* ───────── 교재 음성 클립 재생 ───────── */
-  var CLIP_LEAD = 0.06;     // 발화 앞 여유(초)
-  var CLIP_TAIL = 0.20;     // 발화 뒤 여유(초)
-  var clipEl = null;        // 모든 클립이 함께 쓰는 audio 요소 하나
+  var CLIP_LEAD = 0.10;     // Web Audio 시작 여유(초) — mp3 발화 앞에 0.45초 무음이 있어 그 안쪽에서 시작한다
+  var CLIP_LEAD_ELEMENT = 0.32;  // <audio> 폴백 시작 여유(초) — iOS 페이드인(최대 0.3초)이 무음 안에서 끝나도록
+  var CLIP_TAIL = 0.25;     // 발화 뒤 여유(초) — mp3 뒤에 0.60초 무음이 들어 있다
+  var clipEl = null;        // <audio> 폴백이 함께 쓰는 요소 하나
   var clipNow = null;       // 지금 재생 중인 클립
   var clipTimer = 0;        // 구간 끝 감시 타이머
   var clipBtn = null;       // 재생 중 표시를 붙인 버튼
   var clipBroken = {};      // 열리지 않는 파일(404 등)은 그 판에서 TTS로 고정
+  var clipVoice = null;     // 지금 재생 중인 Web Audio 소스
+  var audioCtx = null;      // AudioContext (iOS는 사용자 손짓 안에서만 열린다)
+  var audioBuffers = {};    // src -> 디코딩해 둔 AudioBuffer
+  var audioLoading = {};    // src -> 디코딩 중인 Promise
+  var audioFailed = {};     // src -> 디코딩 실패(<audio>로만 재생)
 
   function normWord(text) {
     return String(text == null ? '' : text).toLowerCase().replace(/\s+/g, ' ').trim();
@@ -1587,9 +1597,15 @@
       var span = pack.words[key];
       if (!span || span.length < 2) continue;
       var start = Number(span[0]) - CLIP_LEAD;
+      var startEl = Number(span[0]) - CLIP_LEAD_ELEMENT;
       var end = Number(span[1]) + CLIP_TAIL;
       if (!isFinite(start) || !isFinite(end) || end <= start) continue;
-      return { src: pack.src, word: key, start: Math.max(0, start), end: end };
+      return {
+        src: pack.src, word: key,
+        start: Math.max(0, start),
+        startEl: Math.max(0, startEl),
+        end: end
+      };
     }
     return null;
   }
@@ -1615,8 +1631,118 @@
     return clipEl;
   }
 
+  /* ── Web Audio 재생 ──
+     iOS Safari는 <audio>에서 currentTime을 옮긴 직후 play()하면 앞 0.1~0.3초가 잘리거나
+     페이드 인 되는 경우가 있다. 그래서 한 번 받아 둔 mp3는 AudioBufferSourceNode로
+     샘플 단위로 정확하게 start(0, offset, duration)로 재생하고, 아직 디코딩 전인 첫 탭만 <audio>로 넘긴다. */
+  function audioCtor() {
+    return window.AudioContext || window.webkitAudioContext || null;
+  }
+
+  function audioContextLive() {
+    var Ctor = audioCtor();
+    if (!Ctor) return null;
+    if (!audioCtx) {
+      try { audioCtx = new Ctor(); } catch (e) { audioCtx = null; }
+    }
+    return audioCtx;
+  }
+
+  function audioUnlock() {
+    var ctx = audioContextLive();
+    if (!ctx) return null;
+    if (ctx.state === 'suspended' && ctx.resume) {
+      try {
+        var p = ctx.resume();
+        if (p && typeof p.then === 'function') { p.then(function () {}, function () {}); }
+      } catch (e) {}
+    }
+    return ctx;
+  }
+
+  function loadClip(src) {
+    var ctx = audioContextLive();
+    if (!ctx || audioFailed[src]) return null;
+    if (audioBuffers[src]) return Promise.resolve(audioBuffers[src]);
+    if (audioLoading[src]) return audioLoading[src];
+    if (typeof fetch !== 'function') return null;
+    var p = fetch(src, { credentials: 'same-origin' }).then(function (res) {
+      if (!res.ok) throw new Error('HTTP ' + res.status);
+      return res.arrayBuffer();
+    }).then(function (data) {
+      return new Promise(function (resolve, reject) {
+        try {
+          // 구형 Safari는 콜백형만 지원한다. 두 방식을 함께 걸어 둔다.
+          var ret = ctx.decodeAudioData(data, resolve, reject);
+          if (ret && typeof ret.then === 'function') ret.then(resolve, reject);
+        } catch (e) { reject(e); }
+      });
+    }).then(function (buf) {
+      audioBuffers[src] = buf;
+      audioLoading[src] = null;
+      return buf;
+    }, function () {
+      audioLoading[src] = null;
+      audioFailed[src] = true;
+      return null;
+    });
+    audioLoading[src] = p;
+    return p;
+  }
+
+  function prefetchClip() {
+    var cw = currentWord();
+    var info = cw ? clipFor(cw.word) : null;
+    if (info) loadClip(info.src);
+  }
+
+  /* 첫 손짓에서 오디오 잠금을 풀고, 그 단어의 음원을 미리 받아 둔다 */
+  function primeAudioOnce() {
+    audioUnlock();
+    prefetchClip();
+  }
+  if (typeof document !== 'undefined' && document.addEventListener) {
+    document.addEventListener('pointerdown', primeAudioOnce, true);
+    document.addEventListener('touchstart', primeAudioOnce, true);
+  }
+
+  function playBuffer(info) {
+    var ctx = audioContextLive();
+    if (!ctx) return false;
+    var buf = audioBuffers[info.src];
+    if (!buf) return false;
+    if (ctx.state === 'suspended' && ctx.resume) { try { ctx.resume(); } catch (e) {} }
+    var start = Math.max(0, Math.min(info.start, Math.max(0, buf.duration - 0.05)));
+    var dur = Math.min(info.end - info.start, buf.duration - start);
+    if (!(dur > 0.05)) return false;
+    var src;
+    try { src = ctx.createBufferSource(); } catch (e) { return false; }
+    try {
+      src.buffer = buf;
+      src.connect(ctx.destination);
+    } catch (e) { return false; }
+    clipVoice = src;
+    src.onended = function () { if (clipNow === info) stopClip(); };
+    try {
+      src.start(0, start, dur);   // 샘플 단위로 정확히 이 지점부터 이 길이만큼
+    } catch (e) {
+      clipVoice = null;
+      return false;
+    }
+    clipTimer = setTimeout(function () {
+      if (clipNow === info) stopClip();
+    }, Math.round(dur * 1000) + 800);
+    return true;
+  }
+
   function stopClip() {
     if (clipTimer) { clearTimeout(clipTimer); clipTimer = 0; }
+    if (clipVoice) {
+      try { clipVoice.onended = null; } catch (e) {}
+      try { clipVoice.stop(0); } catch (e) {}
+      try { clipVoice.disconnect(); } catch (e) {}
+      clipVoice = null;
+    }
     if (clipEl) { try { clipEl.pause(); } catch (e) {} }
     if (clipBtn) { clipBtn.classList.remove('speaking'); clipBtn = null; }
     clipNow = null;
@@ -1637,15 +1763,27 @@
   function playClip(info, btn) {
     stopClip();
     if (clipBroken[info.src]) { speak(info.word, 0.8); return; }
-    var el;
-    try { el = clipElement(info.src); } catch (e) { speak(info.word, 0.8); return; }
 
     clipNow = info;
     clipBtn = btn || null;
     if (clipBtn) clipBtn.classList.add('speaking');
 
+    // ① 이미 받아 둔 음원이 있으면 Web Audio로 (iOS 앞 잘림·페이드인 없음)
+    if (audioBuffers[info.src] && playBuffer(info)) return;
+
+    // ② 아직이면 이번 탭은 <audio>로 재생하면서, 다음 탭부터 Web Audio를 쓰도록 미리 받아 둔다
+    if (!audioFailed[info.src]) loadClip(info.src);
+    playElement(info);
+  }
+
+  /* <audio> 폴백: 시작점을 앞 무음 패딩(0.45초) 안쪽(발화 0.32초 전)으로 잡아 iOS 페이드인이 무음 안에서 끝난다 */
+  function playElement(info) {
+    var el;
+    try { el = clipElement(info.src); } catch (e) { stopClip(); speak(info.word, 0.8); return; }
+
     var settled = false;
     var guard = setTimeout(function () { if (!settled) giveUp(false); }, 4000);
+    var seekTo = (typeof info.startEl === 'number') ? info.startEl : info.start;
 
     function settle() { settled = true; clearTimeout(guard); }
     function giveUp(permanent) {
@@ -1656,15 +1794,15 @@
     }
     function attempt(retried) {
       if (clipNow !== info) { settle(); return; }
-      try { el.currentTime = info.start; } catch (e) {}
+      try { el.currentTime = seekTo; } catch (e) {}
       var p;
       try { p = el.play(); } catch (e) { giveUp(true); return; }
       if (p && typeof p.then === 'function') {
         p.then(function () {
           settle();
           // iOS Safari에서 가끔 seek가 무시되면 재생 직후 한 번 더 맞춰 준다
-          if (Math.abs(el.currentTime - info.start) > 0.35) {
-            try { el.currentTime = info.start; } catch (e) {}
+          if (Math.abs(el.currentTime - seekTo) > 0.30) {
+            try { el.currentTime = seekTo; } catch (e) {}
           }
           clipWatch();
         }, function () {
