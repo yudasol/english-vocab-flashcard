@@ -1662,6 +1662,10 @@
       if (p && typeof p.then === 'function') {
         p.then(function () {
           settle();
+          // iOS Safari에서 가끔 seek가 무시되면 재생 직후 한 번 더 맞춰 준다
+          if (Math.abs(el.currentTime - info.start) > 0.35) {
+            try { el.currentTime = info.start; } catch (e) {}
+          }
           clipWatch();
         }, function () {
           if (!retried && el.readyState < 3) {
