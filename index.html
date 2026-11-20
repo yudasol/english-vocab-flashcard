@@ -167,6 +167,11 @@
   }
   .speak:active{transform:scale(.96);}
   .speak.speaking{background:#ffeecb;}
+  .clip-tag{
+    display:inline-flex;align-items:center;gap:3px;margin-top:3px;padding:2px 9px;border-radius:999px;
+    font-size:10.5px;font-weight:800;color:#0b7a58;background:#e5f8f0;border:1px solid #bde8d4;letter-spacing:-.01em;
+  }
+  .mini-clip{font-size:10px;line-height:1;color:#0b8a62;margin-left:2px;}
 
   /* ── 발음 기호 · 문장 듣기 · 따라 말하기 ── */
   .card-ipa{
@@ -524,7 +529,7 @@
     <div class="word-list" id="wordList"></div>
   </section>
 
-  <p class="footnote">단어와 학습 기록은 이 브라우저에만 저장돼요(localStorage). 기기를 바꾸거나 브라우저 기록을 지우면 처음 상태로 돌아갑니다.<br>🎤 따라 말하기는 마이크를 쓰는 기능이라 https 주소(예: GitHub Pages)로 열 때 동작해요.</p>
+  <p class="footnote">단어와 학습 기록은 이 브라우저에만 저장돼요(localStorage). 기기를 바꾸거나 브라우저 기록을 지우면 처음 상태로 돌아갑니다.<br>🎤 따라 말하기는 마이크를 쓰는 기능이라 https 주소(예: GitHub Pages)로 열 때 동작해요.<br>🎧 표시된 단어는 교재 MP3 원어민 발음으로, 나머지 단어는 기기 음성(TTS)으로 들려줘요.</p>
 </div>
 
 <div class="toast" id="toast" role="status" aria-live="polite"></div>
@@ -1197,6 +1202,44 @@
     [37, 'not', '~아니다, ~않다', 'nɑt', 'I am not tired.']
   ];
 
+  /* ───────── 교재 MP3 원어민 발음 클립 ─────────
+     교재 녹음에서 단어별 발화 구간을 재어 둔 표.
+     형식: { Day: { src: 'audio/day15.mp3', words: { '단어': [발화시작초, 발화끝초] } } }
+     초 값은 오디오 파형의 무음 구간을 분석해 잰 실제 발화 지점이고, 재생할 때 앞뒤로 조금씩 여유를 붙인다.
+     Day 15: 교재 녹음(3분 10초)에서 단어 25개 발음만 순서대로 잘라 33초짜리 audio/day15.mp3 로 만들었다. */
+  var AUDIO_CLIPS = {
+    15: {
+      src: 'audio/day15.mp3',
+      words: {
+        'free time': [0.257, 1.232],
+        'picnic': [1.853, 2.689],
+        'relax': [3.298, 4.183],
+        'rest': [4.787, 5.393],
+        'gym': [6.001, 6.573],
+        'schedule': [7.174, 8.024],
+        'plan': [8.623, 9.296],
+        'downtown': [9.902, 10.830],
+        'travel': [11.451, 12.108],
+        'trip': [12.724, 13.155],
+        'vacation': [13.756, 14.717],
+        'hide': [15.323, 15.899],
+        'library': [16.495, 17.381],
+        'choose': [17.989, 18.695],
+        'pick': [19.301, 19.763],
+        'lend': [20.371, 21.005],
+        'diary': [21.618, 22.449],
+        'write': [23.050, 23.646],
+        'study': [24.242, 25.001],
+        'hit': [25.612, 26.026],
+        'cry': [26.620, 27.310],
+        'fix': [27.834, 28.498],
+        'go': [29.101, 29.767],
+        'continue': [30.373, 31.237],
+        'stay': [31.838, 32.608]
+      }
+    }
+  };
+
   function defaultWords() {
     var today = ymd(new Date());
     return WORDS.map(function (w) {
@@ -1521,6 +1564,134 @@
     }
   }
 
+  /* ───────── 교재 음성 클립 재생 ───────── */
+  var CLIP_LEAD = 0.06;     // 발화 앞 여유(초)
+  var CLIP_TAIL = 0.20;     // 발화 뒤 여유(초)
+  var clipEl = null;        // 모든 클립이 함께 쓰는 audio 요소 하나
+  var clipNow = null;       // 지금 재생 중인 클립
+  var clipTimer = 0;        // 구간 끝 감시 타이머
+  var clipBtn = null;       // 재생 중 표시를 붙인 버튼
+  var clipBroken = {};      // 열리지 않는 파일(404 등)은 그 판에서 TTS로 고정
+
+  function normWord(text) {
+    return String(text == null ? '' : text).toLowerCase().replace(/\s+/g, ' ').trim();
+  }
+
+  function clipFor(text) {
+    var key = normWord(text);
+    if (!key) return null;
+    for (var day in AUDIO_CLIPS) {
+      if (!Object.prototype.hasOwnProperty.call(AUDIO_CLIPS, day)) continue;
+      var pack = AUDIO_CLIPS[day];
+      if (!pack || !pack.words || !Object.prototype.hasOwnProperty.call(pack.words, key)) continue;
+      var span = pack.words[key];
+      if (!span || span.length < 2) continue;
+      var start = Number(span[0]) - CLIP_LEAD;
+      var end = Number(span[1]) + CLIP_TAIL;
+      if (!isFinite(start) || !isFinite(end) || end <= start) continue;
+      return { src: pack.src, word: key, start: Math.max(0, start), end: end };
+    }
+    return null;
+  }
+
+  function clipElement(src) {
+    if (!clipEl) {
+      clipEl = document.createElement('audio');
+      clipEl.id = 'clipAudio';
+      clipEl.preload = 'auto';
+      clipEl.setAttribute('playsinline', '');
+      clipEl.setAttribute('webkit-playsinline', '');
+      clipEl.setAttribute('aria-hidden', 'true');
+      clipEl.style.cssText = 'position:absolute;left:-9999px;width:1px;height:1px;opacity:0;pointer-events:none';
+      document.body.appendChild(clipEl);
+      clipEl.addEventListener('timeupdate', clipTick);
+      clipEl.addEventListener('ended', stopClip);
+    }
+    if (clipEl.getAttribute('data-src') !== src) {
+      clipEl.setAttribute('data-src', src);
+      clipEl.src = src;
+      try { clipEl.load(); } catch (e) {}
+    }
+    return clipEl;
+  }
+
+  function stopClip() {
+    if (clipTimer) { clearTimeout(clipTimer); clipTimer = 0; }
+    if (clipEl) { try { clipEl.pause(); } catch (e) {} }
+    if (clipBtn) { clipBtn.classList.remove('speaking'); clipBtn = null; }
+    clipNow = null;
+  }
+
+  function clipTick() {
+    if (!clipNow || !clipEl) return;
+    if (clipEl.ended || clipEl.currentTime >= clipNow.end - 0.02) stopClip();
+  }
+
+  function clipWatch() {
+    if (!clipNow || !clipEl) return;
+    if (clipEl.paused) { stopClip(); return; }
+    if (clipEl.currentTime >= clipNow.end - 0.015) { stopClip(); return; }
+    clipTimer = setTimeout(clipWatch, 25);
+  }
+
+  function playClip(info, btn) {
+    stopClip();
+    if (clipBroken[info.src]) { speak(info.word, 0.8); return; }
+    var el;
+    try { el = clipElement(info.src); } catch (e) { speak(info.word, 0.8); return; }
+
+    clipNow = info;
+    clipBtn = btn || null;
+    if (clipBtn) clipBtn.classList.add('speaking');
+
+    var settled = false;
+    var guard = setTimeout(function () { if (!settled) giveUp(false); }, 4000);
+
+    function settle() { settled = true; clearTimeout(guard); }
+    function giveUp(permanent) {
+      settle();
+      if (permanent) clipBroken[info.src] = true;
+      if (clipNow === info) stopClip();
+      speak(info.word, 0.8);
+    }
+    function attempt(retried) {
+      if (clipNow !== info) { settle(); return; }
+      try { el.currentTime = info.start; } catch (e) {}
+      var p;
+      try { p = el.play(); } catch (e) { giveUp(true); return; }
+      if (p && typeof p.then === 'function') {
+        p.then(function () {
+          settle();
+          clipWatch();
+        }, function () {
+          if (!retried && el.readyState < 3) {
+            el.addEventListener('canplay', function () { attempt(true); }, { once: true });
+          } else {
+            giveUp(true);
+          }
+        });
+      } else {
+        settle();
+        clipWatch();
+      }
+    }
+
+    if (el.readyState >= 1) {
+      attempt(false);
+    } else {
+      el.addEventListener('loadedmetadata', function () { attempt(false); }, { once: true });
+      el.addEventListener('error', function () { giveUp(true); }, { once: true });
+      try { el.load(); } catch (e) { giveUp(true); }
+    }
+  }
+
+  /* 단어 발음: 교재 음원이 있으면 그 구간, 없으면 지금까지처럼 TTS */
+  function sayWord(text, btn) {
+    var info = clipFor(text);
+    if (!info) { speak(text, 0.8); return; }
+    playClip(info, btn);
+  }
+
   /* ───────── 발음 기호 ───────── */
   function ipaRaw(w) {
     return String((w && w.ipa) || '').replace(/^[\s\/\[]+/, '').replace(/[\s\/\]]+$/, '').trim();
@@ -1709,7 +1880,8 @@
     var ipa = ipaDisp(w);
     var hintTop = ipa ? esc(w.word + ' ' + ipa) : esc(w.word);
     var wordBlock = '<div class="card-word">' + esc(w.word) + '</div>' +
-      (ipa ? '<div class="card-ipa">' + esc(ipa) + '</div>' : '');
+      (ipa ? '<div class="card-ipa">' + esc(ipa) + '</div>' : '') +
+      (clipFor(w.word) ? '<div class="clip-tag" title="교재 MP3 원어민 발음으로 들려줘요">🎧 교재 음성</div>' : '');
     var ex = w.example
       ? '<div class="example-row">' +
           '<p class="card-example">' + esc(w.example) + '</p>' +
@@ -1973,6 +2145,7 @@
           '<div class="word-en">' + esc(w.word) +
             (day ? '<span class="badge day">Day ' + day + '</span>' : '') +
             '<button class="mini-speak" type="button" data-speak="' + esc(w.word) + '" aria-label="' + esc(w.word) + ' 발음 듣기">🔊</button>' +
+            (clipFor(w.word) ? '<span class="mini-clip" title="교재 음성">🎧</span>' : '') +
           '</div>' +
           (ipa ? '<div class="word-ipa">' + esc(ipa) + '</div>' : '') +
           '<div class="word-ko">' + esc(w.meaning) + ' · ' + esc(lastReviewedLabel(w)) + '</div>' +
@@ -2304,7 +2477,7 @@
       var speakEl = e.target.closest('[data-speak]');
       if (speakEl) {
         e.stopPropagation();
-        speak(speakEl.getAttribute('data-speak'), 0.8);
+        sayWord(speakEl.getAttribute('data-speak'), speakEl);
         return;
       }
       if (e.target.closest('[data-say]')) {
@@ -2341,7 +2514,7 @@
       if (!e.target || !e.target.closest) return;
       var sp = e.target.closest('[data-speak]');
       if (sp && !e.target.closest('#flipCard')) {
-        speak(sp.getAttribute('data-speak'), 0.8);
+        sayWord(sp.getAttribute('data-speak'), sp);
       }
       var act = e.target.closest('[data-act]');
       if (act) {
@@ -2465,6 +2638,16 @@
   }
 
   function boot() {
+    // 페이지를 열면 교재 음원을 미리 받아 둔다 (첫 탭에서 바로 재생되도록)
+    try {
+      for (var pk in AUDIO_CLIPS) {
+        if (Object.prototype.hasOwnProperty.call(AUDIO_CLIPS, pk) && AUDIO_CLIPS[pk] && AUDIO_CLIPS[pk].src) {
+          clipElement(AUDIO_CLIPS[pk].src);
+          break;
+        }
+      }
+    } catch (e) {}
+
     var saved = load();
     var legacy = false;
     if (saved && Array.isArray(saved.words)) {
