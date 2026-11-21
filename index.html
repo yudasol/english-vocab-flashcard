@@ -2164,8 +2164,11 @@
      · 파일 이름: d{Day}-{단어슬러그}.mp3  (예: audio/ex/d1-happy.mp3, audio/ex/d15-picnic.mp3)
      · 목소리: AnaNeural(어린이 음성) pitch −22Hz · rate −6% → 발화 기본 음높이 약 250~276Hz(10~11살 여아대)
      · 교재 569단어만 파일이 있고, 직접 추가한 단어는 브라우저 TTS(높은 pitch)로 읽는다.
-     · iOS에서 구간 이동 없이 파일 처음부터 재생하므로 페이드인·잘림 문제가 없다. */
+     · iOS에서 구간 이동 없이 파일 처음부터 재생하므로 페이드인·잘림 문제가 없다.
+     · EX_V_MAP: 음성을 다시 만든 파일만 버전을 올려 그 파일만 새로 받게 한다(나머지 캐시는 그대로).
+       d15-fix = "Can you fix my bike?" 마지막 /k/가 들리지 않던 문제를 고쳐 v2로 교체. */
   var EX_V = '1';
+  var EX_V_MAP = { 'd15-fix': '2' };
   var EX_AUDIO = (function () {
     var map = {};
     for (var i = 0; i < WORDS.length; i++) {
@@ -2196,7 +2199,8 @@
     if (!w || !w.word) return null;
     var key = exKey(w.word, dayOf(w));
     if (!key || !Object.prototype.hasOwnProperty.call(EX_AUDIO, key)) return null;
-    return { key: key, src: 'audio/ex/' + key + '.mp3?v=' + EX_V };
+    var v = EX_V_MAP[key] || EX_V;
+    return { key: key, src: 'audio/ex/' + key + '.mp3?v=' + v };
   }
 
   function exampleElement(src) {
