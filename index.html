@@ -2166,9 +2166,11 @@
      · 교재 569단어만 파일이 있고, 직접 추가한 단어는 브라우저 TTS(높은 pitch)로 읽는다.
      · iOS에서 구간 이동 없이 파일 처음부터 재생하므로 페이드인·잘림 문제가 없다.
      · EX_V_MAP: 음성을 다시 만든 파일만 버전을 올려 그 파일만 새로 받게 한다(나머지 캐시는 그대로).
-       d15-fix = "Can you fix my bike?" 마지막 /k/가 들리지 않던 문제를 고쳐 v2로 교체. */
+       v2 — 문장 끝이 무성 파열음(/p t k/)이라 마지막 소리가 거의 들리지 않던 6개를 고쳤다:
+       d15-fix ("…my bike?") · d15-plan ("…for our trip.") · d15-trip ("Have a good trip!") ·
+       d15-vacation ("…next week.") · d15-choose ("…one book.") · d15-lend ("…a book?") */
   var EX_V = '1';
-  var EX_V_MAP = { 'd15-fix': '2' };
+  var EX_V_MAP = { 'd15-fix': '2', 'd15-plan': '2', 'd15-trip': '2', 'd15-vacation': '2', 'd15-choose': '2', 'd15-lend': '2' };
   var EX_AUDIO = (function () {
     var map = {};
     for (var i = 0; i < WORDS.length; i++) {
